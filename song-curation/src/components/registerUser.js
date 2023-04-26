@@ -2,18 +2,28 @@ import React, { useState } from 'react';
 import userService from '../services/userAccount'
 import Input from './input';
 import Button from './button';
+import Error from './errorMessage';
 
 const Register = () => {
 
+  // fill form
+  // validate form
+  // submit form
+  // redirect to login after successful submission
+
   const [states, setStates] = useState({
+    firstname:'',
     email:'',
     password:'',
-    confirmPassword:''
+    confirmPassword:'',
+    displayError: false
   })
 
   const [errors, setErrors] = useState({
     email:'',
-    password:'',
+    lowercase:'',
+    uppercase:'',
+    length: '',
     confirmPassword:''
   })
 
@@ -25,7 +35,13 @@ const Register = () => {
       /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
     );
 
-    // const validPasswordRegex = 
+    const validPasswordRegex = RegExp(/(?=.*[a-z])(?=.*[A-Z])[A-Za-z\d@$!%*?&]{8,32}/)
+
+    const lowercaseRegex = RegExp(/(?=.*[a-z])/)
+
+    const uppercaseRegex = RegExp(/(?=.*[A-Z])/)
+
+    const lengthRegex = RegExp(/[A-Za-z\d@$!%*?&]{8,32}/)
 
     switch(name) {
       case "email" :
@@ -35,17 +51,24 @@ const Register = () => {
         break
 
       // I NEED TO DO THE REGEX FOR A STRONG PASSWORD
-      // case "password" :
-      //   errors.password = validPasswordRegex.test(value)
-      //                   ? ""
-      //                   : ;
-      //   break
+      case "password" :
+        errors.lowercase = lowercaseRegex.test(value)
+                        ? ""
+                        : "Password must contain a lowercase letter";
+        errors.uppercase = uppercaseRegex.test(value)
+                        ? ""
+                        : "Password must contain an uppercase letter";
+        errors.length = lengthRegex.test(value)
+                        ? ""
+                        : "Password must have at least 8 characters";                        
+        break
       
       case "confirmPassword" :
         errors.confirmPassword = value === states.password
                         ? ""
                         : "Passwords do not match";
         break
+
       default:
         break
     }
@@ -53,16 +76,35 @@ const Register = () => {
     setStates({...states, [name]: value})
   }
 
-  const validation = () => {}
+  const validation = (err) => {
 
+    const value = Object.values(err)
+                    .map(error => error.length)
+                    .reduce((sum, length) => sum + length)
+    return value
+  }
+
+  
   const handleSubmit = (e) => {
     e.preventDefault();
-    // const response = await axios.post('http://localhost:5000/register', {
-    //   email: states.email,
-    //   password: states.password,
-    //   confirmPassword: states.confirmPassword
-    // });
-    // console.log(response.data);
+
+    const newUser = {
+      firstName: states.firstname,
+      email: states.email,
+      password: states.password
+    }
+
+    if (validation(errors) !== 0){
+      setStates({...states, displayError: true})
+    }
+    else{
+      setStates({...states, displayError: false})
+      userService.create(newUser).then( res => {
+        console.log(res.data)
+      })
+    }
+
+    
   }
 
   return (
@@ -79,6 +121,9 @@ const Register = () => {
             class="input"
             labelClass="input-label"
           />
+
+        {states.displayError && errors.email.length > 0 && <Error message={errors.email} />}
+        
         <Input
             title='PASSWORD'
             name='password'
@@ -89,6 +134,9 @@ const Register = () => {
             class="input"
             labelClass="input-label"
           />
+          {states.displayError && errors.lowercase.length > 0 && <Error message={errors.lowercase} />}
+          {states.displayError && errors.uppercase.length > 0  && <Error message={errors.uppercase} />}
+          {states.displayError && errors.length.length > 0  && <Error message={errors.length} />}
 
         <Input
             title='CONFIRM PASSWORD'
@@ -100,6 +148,8 @@ const Register = () => {
             class="input"
             labelClass="input-label"
           />
+          {states.displayError && errors.confirmPassword.length > 0 && <Error message={errors.confirmPassword} />}
+          
 
         <Button 
             title="Create Your Account" 
