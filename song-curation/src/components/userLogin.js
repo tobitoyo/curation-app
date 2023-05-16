@@ -2,9 +2,14 @@ import React, { useState, useEffect } from 'react';
 import userService from '../services/userAccount'
 import Input from './input';
 import Button from './button';
+import Link from './link';
 import '../styles/login.css'
 
 const Login = () => {
+
+  const divStyle ={
+    margin: 'auto'
+  }
 
   const [states, setStates] = useState({
     email:'',
@@ -35,7 +40,7 @@ const Login = () => {
 
 
   return (
-    <div>
+    <div style={divStyle} >
       <div className='form'>
         <div className='form-header-div'>
           <h1 className='form-header-item-one'>Welcome Back!</h1>
@@ -43,7 +48,7 @@ const Login = () => {
         </div>
 
             <Input
-              title='EMAIL'
+              title='email'
               name='email'
               inputType='email'
               value={states.email}
@@ -54,7 +59,7 @@ const Login = () => {
             />
 
             <Input
-              title='PASSWORD'
+              title='password'
               name='password'
               inputType='password'
               value={states.password}
@@ -64,7 +69,10 @@ const Login = () => {
               labelClass="input-label"
             />
 
-            <a href='#'>Forgot your password?</a>
+            <Link 
+              link='#'
+              text='Forgot your password?'
+            />
 
             <Button 
               title="Login" 
@@ -72,7 +80,12 @@ const Login = () => {
               className="btn-class"
             />
 
-          <p>Need an account? <a href="/signup">Register</a> </p>
+          <p>Need an account? 
+            <Link 
+              link='/signup'
+              text='Register'
+            />
+          </p>
 
       </div>
     </div>

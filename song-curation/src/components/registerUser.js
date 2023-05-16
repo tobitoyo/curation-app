@@ -3,6 +3,7 @@ import userService from '../services/userAccount'
 import Input from './input';
 import Button from './button';
 import Error from './errorMessage';
+import Link from './link';
 
 const Register = () => {
 
@@ -12,7 +13,7 @@ const Register = () => {
   // redirect to login after successful submission
 
   const [states, setStates] = useState({
-    firstname:'',
+    username:'',
     email:'',
     password:'',
     confirmPassword:'',
@@ -35,7 +36,6 @@ const Register = () => {
       /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
     );
 
-    const validPasswordRegex = RegExp(/(?=.*[a-z])(?=.*[A-Z])[A-Za-z\d@$!%*?&]{8,32}/)
 
     const lowercaseRegex = RegExp(/(?=.*[a-z])/)
 
@@ -89,7 +89,7 @@ const Register = () => {
     e.preventDefault();
 
     const newUser = {
-      firstName: states.firstname,
+      userName: states.username,
       email: states.email,
       password: states.password
     }
@@ -99,9 +99,12 @@ const Register = () => {
     }
     else{
       setStates({...states, displayError: false})
-      userService.create(newUser).then( res => {
-        console.log(res.data)
-      })
+
+      userService
+        .create(newUser)
+        .then( res => {
+          console.log(res.data)
+        })
     }
 
     
@@ -110,9 +113,20 @@ const Register = () => {
   return (
     <div className='form'>
       <h2>Register</h2>
+
+        <Input
+            title='Username'
+            name='username'
+            inputType='text'
+            value={states.username}
+            placeholder='Enter your username'
+            inputChange={handleInputChange}
+            class="input"
+            labelClass="input-label"
+          />
       
         <Input
-            title='EMAIL'
+            title='email'
             name='email'
             inputType='email'
             value={states.email}
@@ -125,7 +139,7 @@ const Register = () => {
         {states.displayError && errors.email.length > 0 && <Error message={errors.email} />}
         
         <Input
-            title='PASSWORD'
+            title='password'
             name='password'
             inputType='password'
             value={states.password}
@@ -139,7 +153,7 @@ const Register = () => {
           {states.displayError && errors.length.length > 0  && <Error message={errors.length} />}
 
         <Input
-            title='CONFIRM PASSWORD'
+            title='confirm password'
             name='confirmPassword'
             inputType='password'
             value={states.confirmPassword}
@@ -157,6 +171,10 @@ const Register = () => {
             className="btn-class"
           />
       
+        <Link 
+          link='/login'
+          text='Already have an account? Log In'
+        />
     </div>
   );
 };

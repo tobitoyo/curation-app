@@ -1,6 +1,12 @@
+require('dotenv').config() 
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const User = require('./models/user')
+
+
+
+
 
 
 const unknownEndpoint = (req, res) => {
@@ -42,7 +48,10 @@ app.get('/', (req, res) => {
 })
 
 app.get('/users', (req, res) => {
-  res.json(users)
+  User.find({})
+    .then(users => {
+      res.json(users)
+    })
 })
 
 app.get('/users/:id', (req, res) => {
@@ -60,6 +69,19 @@ app.get('/users/:id', (req, res) => {
  
 app.post('/users', (req,res) => {
   const user = req.body
+  console.log(user)
+  const newUser = new userModel.User(user)
+  console.log(newUser)
+  
+  newUser
+    .save()
+    .then(result => {
+      console.log('We have a new user!!')
+      mongoose.connection.close()
+    })
+    .catch((err) => {
+      console.error('Did not add new user??')
+    })
   res.json(user)
 })
 
